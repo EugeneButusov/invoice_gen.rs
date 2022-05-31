@@ -17,6 +17,7 @@ invoice_gen --blueprint-path <BLUEPRINT_PATH> --invoiced-at <INVOICED_AT> --outp
 ### Options:
 ```
 -b, --blueprint-path <BLUEPRINT_PATH>    Blueprint file path
+-d, --days-off <DAYS_OFF>                Amount of non-working days [default: 0]
 -h, --help                               Print help information
 -i, --invoiced-at <INVOICED_AT>          Date invoice generated at
 -o, --output <OUTPUT>                    Output invoice file

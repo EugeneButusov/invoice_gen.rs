@@ -16,6 +16,10 @@ struct Args {
     /// Output invoice file
     #[clap(short, long)]
     output: String,
+
+    /// Amount of non-working days
+    #[clap(short, long, default_value_t = 0)]
+    days_off: u8,
 }
 
 fn main() {
@@ -30,7 +34,7 @@ fn main() {
         vec![InvoiceItem::new_for_daily_work(
             invoiced_at,
             invoice_blueprint.salary,
-            0,
+            args.days_off,
         )],
     );
 

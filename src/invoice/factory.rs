@@ -111,12 +111,12 @@ impl Invoice {
 }
 
 impl InvoiceItem {
-    pub fn new_for_daily_work(invoiced_at: Date<Utc>, salary: f64, days_off: i8) -> InvoiceItem {
+    pub fn new_for_daily_work(invoiced_at: Date<Utc>, salary: f64, days_off: u8) -> InvoiceItem {
         let total_days = calc_work_days(invoiced_at.month(), invoiced_at.year());
-        let worked_days = total_days - days_off;
+        let worked_days = total_days - days_off as i8;
 
         InvoiceItem {
-            amount: (salary * 100.0 * worked_days as f64 / total_days as f64).round() / 100.0,
+            amount: salary * worked_days as f64 / total_days as f64,
             description: format!(
                 "{} ({} / {} work days)",
                 invoiced_at.format("%B, %Y"),
