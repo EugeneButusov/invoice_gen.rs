@@ -68,13 +68,16 @@ fn breaklines_helper(
     }
 }
 
-fn generate_invoice(invoice_data: &Invoice, template_path: &str) -> String {
+fn generate_invoice(invoice_data: &Invoice) -> String {
     let mut handlebars = Handlebars::new();
     handlebars.register_helper("breaklines", Box::new(breaklines_helper));
     handlebars.register_helper("inc", Box::new(inc_helper));
     handlebars.register_helper("to_fixed", Box::new(to_fixed_helper));
     handlebars
-        .register_template_file(INVOICE_TEMPLATE_NAME, template_path)
+        .register_template_string(
+            INVOICE_TEMPLATE_NAME,
+            include_str!("../../assets/invoice_template.html"),
+        )
         .expect("Invoice::export -> Unable to register template");
 
     let mut data = Map::new();
@@ -101,8 +104,8 @@ fn save_to_pdf(html_data: String, result_path: &str) {
 }
 
 impl Invoice {
-    pub fn export_as_pdf(&self, template_path: &str, output_file: &str) {
-        let result = generate_invoice(self, template_path);
+    pub fn export_as_pdf(&self, output_file: &str) {
+        let result = generate_invoice(self);
         save_to_pdf(result, output_file);
     }
 }

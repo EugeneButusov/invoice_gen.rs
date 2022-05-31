@@ -34,5 +34,5 @@ fn main() {
         )],
     );
 
-    invoice.export_as_pdf("./assets/invoice_template.html", args.output.as_str());
+    invoice.export_as_pdf(args.output.as_str());
 }
