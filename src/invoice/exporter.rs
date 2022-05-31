@@ -75,7 +75,7 @@ fn generate_invoice(invoice_data: &Invoice, template_path: &str) -> String {
     handlebars.register_helper("to_fixed", Box::new(to_fixed_helper));
     handlebars
         .register_template_file(INVOICE_TEMPLATE_NAME, template_path)
-        .unwrap();
+        .expect("Invoice::export -> Unable to register template");
 
     let mut data = Map::new();
     data.insert("invoice".to_string(), to_json(invoice_data));
@@ -83,17 +83,21 @@ fn generate_invoice(invoice_data: &Invoice, template_path: &str) -> String {
         "amount_total".to_string(),
         to_json(invoice_data.get_total_items_amount()),
     );
-    return handlebars.render(INVOICE_TEMPLATE_NAME, &data).unwrap();
+    return handlebars
+        .render(INVOICE_TEMPLATE_NAME, &data)
+        .expect("Invoice::export -> Invoice rendering failed");
 }
 
 fn save_to_pdf(html_data: String, result_path: &str) {
-    let pdf_app = PdfApplication::new().expect("Failed to init PDF application");
+    let pdf_app = PdfApplication::new().expect("Invoice::export -> Failed to init PDF application");
     let mut pdfout = pdf_app
         .builder()
         .build_from_html(&html_data)
-        .expect("failed to build pdf");
+        .expect("Invoice::export -> Failed to build pdf");
 
-    pdfout.save(result_path).expect("failed to save pdf");
+    pdfout
+        .save(result_path)
+        .expect("Invoice::export -> Failed to save pdf");
 }
 
 impl Invoice {
