@@ -4,6 +4,11 @@ A simple tool to generate PDF invoices for your lovely customers.
 ## Prerequisites
 To use this tool, please make sure you have [wkhtmltopdf](https://github.com/wkhtmltopdf/packaging/releases) installed on your machine.
 
+## Installation
+```
+cargo install --git https://github.com/EugeneButusov/invoice_gen.rs.git
+```
+
 ## Usage
 ```
 invoice_gen --blueprint-path <BLUEPRINT_PATH> --invoiced-at <INVOICED_AT> --output <OUTPUT>
