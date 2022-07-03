@@ -1,10 +1,9 @@
 use crate::util::date_deserialize;
-use chrono::{serde, Date, DateTime, Duration, FixedOffset, SecondsFormat, Utc};
+use chrono::{DateTime, Duration, FixedOffset, SecondsFormat};
 use std::ops::Add;
 
 #[derive(Deserialize, Debug)]
 struct TimeInterval {
-    duration: String,
     #[serde(deserialize_with = "date_deserialize")]
     end: DateTime<FixedOffset>,
     #[serde(deserialize_with = "date_deserialize")]
@@ -13,7 +12,6 @@ struct TimeInterval {
 
 #[derive(Deserialize, Debug)]
 struct TimeEntry {
-    description: String,
     #[serde(rename = "timeInterval")]
     time_interval: TimeInterval,
 }

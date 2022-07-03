@@ -125,4 +125,11 @@ impl InvoiceItem {
             ),
         }
     }
+
+    pub fn new_for_clockify_period() -> InvoiceItem {
+        InvoiceItem {
+            amount: 0 as f64,
+            description: "TBD".to_string(),
+        }
+    }
 }

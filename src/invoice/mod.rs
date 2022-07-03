@@ -1,19 +1,8 @@
+use crate::util::date_serialize;
 use chrono::{Date, Utc};
 
 pub mod exporter;
 pub mod factory;
-
-mod date_serialize {
-    use chrono::{Date, Utc};
-    use serde::{self, Serializer};
-
-    pub fn serialize<S>(date: &Date<Utc>, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        s.serialize_str(&date.format("%B %d, %Y").to_string())
-    }
-}
 
 #[derive(Serialize)]
 pub struct InvoiceBlueprint {
