@@ -1,3 +1,4 @@
+use crate::clockify::ClockifySettings;
 use crate::util::date_serialize;
 use chrono::{Date, Utc};
 
@@ -15,6 +16,7 @@ pub struct InvoiceBlueprint {
     pub currency: String,
     pub signature: String,
     pub salary: f64,
+    pub clockify_settings: ClockifySettings,
 }
 
 #[derive(Serialize)]

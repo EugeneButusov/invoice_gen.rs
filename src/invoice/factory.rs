@@ -1,3 +1,4 @@
+use crate::clockify::ClockifySettings;
 use crate::invoice::{Invoice, InvoiceBlueprint, InvoiceItem};
 use chrono::prelude::*;
 use chrono::Duration;
@@ -26,14 +27,14 @@ fn calc_work_days(month: u32, year: i32) -> i8 {
 
 impl InvoiceBlueprint {
     pub fn from_file(path: &str) -> InvoiceBlueprint {
-        let invoice_data = toml::from_str::<toml::Value>(
+        let invoice_blueprint_data = toml::from_str::<toml::Value>(
             std::fs::read_to_string(path)
                 .expect("Blueprint::new -> Cannot read blueprint file")
                 .as_str(),
         )
         .expect("Blueprint::new -> Bad blueprint file format");
 
-        let invoice_data_contract_date = invoice_data["contract"]
+        let invoice_data_contract_date = invoice_blueprint_data["contract"]
             .as_table()
             .expect("Blueprint::new -> Unable to read contract date")["date"]
             .as_datetime()
@@ -45,45 +46,63 @@ impl InvoiceBlueprint {
             invoice_data_contract_date.date.as_ref().unwrap().day as u32,
         );
 
+        let clockify_data = invoice_blueprint_data["clockify"]
+            .as_table()
+            .expect("Blueprint::new -> Unable to read clockify settings");
+
         InvoiceBlueprint {
             contract_number: None,
             contract_date,
-            recipient_data: invoice_data["recipient"]
+            recipient_data: invoice_blueprint_data["recipient"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read recipient data")["data"]
                 .as_str()
                 .expect("Blueprint::new -> Unable to read recipient data")
                 .to_string(),
-            payer_data: invoice_data["payer"]
+            payer_data: invoice_blueprint_data["payer"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read payer data")["data"]
                 .as_str()
                 .expect("Blueprint::new -> Unable to read payer data")
                 .to_string(),
-            payment_instructions: invoice_data["recipient"]
+            payment_instructions: invoice_blueprint_data["recipient"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read payment instructions")
                 ["payment_instructions"]
                 .as_str()
                 .expect("Blueprint::new -> Unable to read payment instructions")
                 .to_string(),
-            currency: invoice_data["contract"]
+            currency: invoice_blueprint_data["contract"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read contract currency")["currency"]
                 .as_str()
                 .expect("Blueprint::new -> Unable to read contract currency")
                 .to_string(),
-            signature: invoice_data["invoice"]
+            signature: invoice_blueprint_data["invoice"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read invoice signature")["signature"]
                 .as_str()
                 .expect("Blueprint::new -> Unable to read invoice signature")
                 .to_string(),
-            salary: invoice_data["contract"]
+            salary: invoice_blueprint_data["contract"]
                 .as_table()
                 .expect("Blueprint::new -> Unable to read contract salary")["salary"]
                 .as_float()
                 .expect("Blueprint::new -> Unable to read contract salary"),
+            clockify_settings: ClockifySettings {
+                api_key: clockify_data["api_key"]
+                    .as_str()
+                    .expect("Blueprint::new -> Unable to read clockify api_key")
+                    .to_string(),
+                workspace_id: clockify_data["workspace_id"]
+                    .as_str()
+                    .expect("Blueprint::new -> Unable to read clockify workspace_id")
+                    .to_string(),
+                user_id: clockify_data["user_id"]
+                    .as_str()
+                    .expect("Blueprint::new -> Unable to read clockify user_id")
+                    .to_string(),
+            },
         }
     }
 }
@@ -126,7 +145,7 @@ impl InvoiceItem {
         }
     }
 
-    pub fn new_for_clockify_period() -> InvoiceItem {
+    pub fn new_for_clockify_period(_from: &DateTime<Utc>, _to: &DateTime<Utc>) -> InvoiceItem {
         InvoiceItem {
             amount: 0 as f64,
             description: "TBD".to_string(),

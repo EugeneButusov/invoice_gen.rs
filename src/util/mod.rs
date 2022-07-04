@@ -1,4 +1,4 @@
-use chrono::{ DateTime, FixedOffset};
+use chrono::{DateTime, FixedOffset};
 use serde::{self, de, Deserialize, Deserializer};
 
 pub mod date_serialize {

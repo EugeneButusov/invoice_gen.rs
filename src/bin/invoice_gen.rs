@@ -1,5 +1,6 @@
 use chrono::prelude::*;
 use clap::Parser;
+use invoice_gen::clockify::client::Client;
 use invoice_gen::invoice::{Invoice, InvoiceBlueprint, InvoiceItem};
 
 #[derive(Parser, Debug)]
@@ -9,6 +10,14 @@ struct Args {
     #[clap(short, long)]
     blueprint_path: String,
 
+    /// Date invoice counts time from
+    #[clap(short, long)]
+    from: DateTime<FixedOffset>,
+
+    /// Date invoice counts time to
+    #[clap(short, long)]
+    to: DateTime<FixedOffset>,
+
     /// Date invoice generated at
     #[clap(short, long)]
     invoiced_at: DateTime<Utc>,
@@ -16,10 +25,6 @@ struct Args {
     /// Output invoice file
     #[clap(short, long)]
     output: String,
-
-    /// Amount of non-working days
-    #[clap(short, long, default_value_t = 0)]
-    days_off: u8,
 }
 
 fn main() {
@@ -28,13 +33,17 @@ fn main() {
 
     let invoice_blueprint = InvoiceBlueprint::from_file(args.blueprint_path.as_str());
 
+    let clockify_client = Client::new(invoice_blueprint.clockify_settings.clone());
+    let duration = clockify_client.get_duration_for_period(&invoice_blueprint.clockify_settings.user_id, &args.from, &args.to);
+    print!("Invoiced duration: {}", &duration);
+
     let invoice = Invoice::from_blueprint(
         &invoice_blueprint,
         invoiced_at,
         vec![InvoiceItem::new_for_daily_work(
             invoiced_at,
             invoice_blueprint.salary,
-            args.days_off,
+            0,
         )],
     );
 

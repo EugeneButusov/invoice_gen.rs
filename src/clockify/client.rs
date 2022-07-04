@@ -1,3 +1,4 @@
+use super::ClockifySettings;
 use crate::util::date_deserialize;
 use chrono::{DateTime, Duration, FixedOffset, SecondsFormat};
 use std::ops::Add;
@@ -17,16 +18,12 @@ struct TimeEntry {
 }
 
 pub struct Client {
-    api_key: String,
-    workspace_id: String,
+    settings: ClockifySettings,
 }
 
 impl Client {
-    pub fn new(api_key: String, workspace_id: String) -> Client {
-        Client {
-            api_key,
-            workspace_id,
-        }
+    pub fn new(settings: ClockifySettings) -> Client {
+        Client { settings }
     }
 
     pub fn get_duration_for_period(
@@ -38,7 +35,7 @@ impl Client {
         let url = format!(
             // TODO: now selection capped up to 5000 entries, need to make looped extractions
             "https://api.clockify.me/api/v1/workspaces/{}/user/{}/time-entries?start={}&end={}&page-size=5000",
-            self.workspace_id,
+            self.settings.workspace_id,
             user_id,
             from.to_rfc3339_opts(SecondsFormat::Millis, true),
             to.to_rfc3339_opts(SecondsFormat::Millis, true)
@@ -46,7 +43,10 @@ impl Client {
 
         let client = reqwest::blocking::Client::new();
 
-        let response = client.get(url).header("X-Api-Key", &self.api_key).send();
+        let response = client
+            .get(url)
+            .header("X-Api-Key", &self.settings.api_key)
+            .send();
 
         let time_entries: Vec<TimeEntry> = match response {
             Ok(response) => match response.json::<Vec<TimeEntry>>() {
