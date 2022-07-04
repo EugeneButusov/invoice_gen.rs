@@ -9,9 +9,10 @@ description = "A simple tool to generate invoices for your customers"
 [dependencies]
 handlebars = "4.2.2"
 wkhtmltopdf = "0.4.0"
-chrono = "0.4.19"
+chrono = { version = "0.4.19", features = ["serde"] }
 serde_json = "1.0.81"
 serde_derive = "1.0.137"
-serde = "1.0.137"
+serde = { version = "1.0.137", features = ["derive"] }
 toml = "0.5.9"
 clap = { version = "3.1.18", features = ["derive"] }
+reqwest = { version = "0.11.10", features = ["blocking", "json"] }
